@@ -1,4 +1,4 @@
-﻿namespace dotnet_reflection
+﻿namespace Shared
 {
     public enum ProviderType
     {

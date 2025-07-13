@@ -1,4 +1,6 @@
-﻿namespace dotnet_reflection
+﻿using Shared;
+
+namespace dotnet_reflection
 {
     internal class AppSettings : ConfigurationComponentBase
     {

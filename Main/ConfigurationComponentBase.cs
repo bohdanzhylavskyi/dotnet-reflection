@@ -1,4 +1,4 @@
-﻿using dotnet_reflection.ConfigurationProviders;
+﻿using Shared;
 using System.Reflection;
 
 namespace dotnet_reflection

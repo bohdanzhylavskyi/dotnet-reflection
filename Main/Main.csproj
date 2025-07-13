@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>dotnet_reflection</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ConfigurationManagerConfigurationProvider\ConfigurationManagerConfigurationProvider.csproj" />
+    <ProjectReference Include="..\FileConfigurationProvider\FileConfigurationProvider.csproj" />
+    <ProjectReference Include="..\Shared\Shared.csproj" />
+  </ItemGroup>
+
+  <Target Name="FileConfigurationProvider" AfterTargets="build">
+    <Move SourceFiles="$(OutputPath)FileConfigurationProvider.dll" DestinationFolder="$(OutputPath)ConfigurationProviders\" />
+  </Target>
+
+  <Target Name="ConfigurationManagerConfigurationProvider" AfterTargets="build">
+    <Move SourceFiles="$(OutputPath)ConfigurationManagerConfigurationProvider.dll" DestinationFolder="$(OutputPath)ConfigurationProviders\" />
+  </Target>
+
+  <ItemGroup>
+    <Configs Include="configs\**\*.*" />
+  </ItemGroup>
+  
+  <Target Name="CopyConfig" AfterTargets="Build">
+    <Copy SourceFiles="@(Configs)" DestinationFolder="$(OutputPath)configs" SkipUnchangedFiles="true" />
+  </Target>
+</Project>
