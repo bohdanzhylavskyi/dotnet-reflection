@@ -1,5 +1,6 @@
 ﻿namespace dotnet_reflection
 {
+    [System.AttributeUsage(System.AttributeTargets.Property)]
     internal class ConfigurationItemAttribute : Attribute
     {
         public string SettingName { get; }

@@ -3,6 +3,6 @@
     public enum ProviderType
     {
         File,
-        AppSettings
+        ConfigurationManager
     }
 }

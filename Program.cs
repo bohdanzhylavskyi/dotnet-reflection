@@ -1,5 +1,4 @@
 ﻿using dotnet_reflection.ConfigurationProviders;
-using System.Reflection;
 
 namespace dotnet_reflection
 {
@@ -17,11 +16,13 @@ namespace dotnet_reflection
             PrintAllProperties(appSettings);
 
             appSettings.MaxRequestPerSecond = 120;
-            appSettings.Locale = "uk";
+            appSettings.Locale = "ch";
             appSettings.RetryTimeout = TimeSpan.Parse("00:05:00");
 
             Console.WriteLine($"\nSettings After Update:");
             PrintAllProperties(appSettings);
+
+            //var x = new FileConfigurationProvider.FileConfigurationProvider(ConfigurationFilePath);
         }
 
         private static void PrintAllProperties(object obj)
@@ -42,7 +43,8 @@ namespace dotnet_reflection
         {
             var providers = new Dictionary<ProviderType, IConfigurationProvider>()
             {
-                { ProviderType.File, new FileConfigurationProvider(ConfigurationFilePath)},
+                //{ ProviderType.File, new FileConfigurationProvider.FileConfigurationProvider(ConfigurationFilePath)},
+                { ProviderType.ConfigurationManager, new ConfigurationManagerConfigurationProvider()},
             };
 
             ConfigurationComponentBase.ConfigureProviders(providers);

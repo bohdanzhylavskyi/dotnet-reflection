@@ -1,5 +1,4 @@
 ﻿using dotnet_reflection.ConfigurationProviders;
-using System.Data.SqlTypes;
 using System.Reflection;
 
 namespace dotnet_reflection

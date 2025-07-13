@@ -2,7 +2,7 @@
 {
     internal class AppSettings : ConfigurationComponentBase
     {
-        [ConfigurationItemAttribute("locale", ProviderType.File)]
+        [ConfigurationItemAttribute("locale", ProviderType.ConfigurationManager)]
         public string? Locale
         {
             get => ReadSetting(nameof(Locale));
