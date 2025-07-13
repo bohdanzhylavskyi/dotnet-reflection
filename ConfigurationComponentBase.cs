@@ -1,4 +1,5 @@
 ﻿using dotnet_reflection.ConfigurationProviders;
+using System.Data.SqlTypes;
 using System.Reflection;
 
 namespace dotnet_reflection
@@ -12,34 +13,39 @@ namespace dotnet_reflection
             Providers = providers;
         }
 
-        public T ReadSetting<T>(string propertyName)
+        public string? ReadSetting(string propertyName)
         {
             PropertyInfo property = this.GetType().GetProperty(propertyName);
 
             var attribute = property.GetCustomAttribute<ConfigurationItemAttribute>();
-            var propertyType = property.PropertyType;
-            MethodInfo parseMethod = propertyType.GetMethod("Parse", new[] { typeof(string) });
 
-            if (parseMethod == null)
+            if (attribute == null)
             {
-                throw new Exception("");
+                throw AttributeNotAppliedToPropertyException(propertyName);
             }
 
-            if (attribute != null)
-            {
-                Console.WriteLine($"Read setting: {propertyName}, attributeSettingName: {attribute.SettingName}, attributeProvider: {attribute.Provider}");
+            return ResolveProvider(attribute.Provider).Get(attribute.SettingName);
+        }
 
+        public int? ReadIntSetting(string propertyName)
+        {
+            var x = ReadSetting(propertyName);
 
-                var provider = ResolveProvider(attribute.Provider);
+            return x == null ? null : int.Parse(x);
+        }
 
-                var obj = parseMethod.Invoke(null, new object[] { provider.Get(attribute.SettingName) });
+        public float? ReadFloatSetting(string propertyName)
+        {
+            var x = ReadSetting(propertyName);
 
-                return (T)obj;
+            return x == null ? null : float.Parse(x);
+        }
 
-            }
+        public TimeSpan? ReadTimeSpanSetting(string propertyName)
+        {
+            var x = ReadSetting(propertyName);
 
-
-            return (T)(object)null;
+            return x == null ? null : TimeSpan.Parse(x);
         }
 
         public void WriteSetting<T>(string propertyName, T value)
@@ -48,14 +54,20 @@ namespace dotnet_reflection
 
             var attribute = property.GetCustomAttribute<ConfigurationItemAttribute>();
 
-            if (attribute != null)
+            if (attribute == null)
             {
-                Console.WriteLine($"Write setting: {propertyName}, value: {value}, attributeSettingName: {attribute.SettingName}, attributeProvider: {attribute.Provider}");
-                var provider = ResolveProvider(attribute.Provider);
-
-                provider.Set(attribute.SettingName, value.ToString());
-                provider.Save();
+                throw AttributeNotAppliedToPropertyException(propertyName);
             }
+
+            var provider = ResolveProvider(attribute.Provider);
+
+            provider.Set(attribute.SettingName, value.ToString());
+            provider.Save();
+        }
+
+        private Exception AttributeNotAppliedToPropertyException(string propertyName)
+        {
+            return new InvalidOperationException($"The '{nameof(ConfigurationItemAttribute)}' attribute is not applied to property '{propertyName}'.");
         }
 
         private IConfigurationProvider ResolveProvider(ProviderType providerType)

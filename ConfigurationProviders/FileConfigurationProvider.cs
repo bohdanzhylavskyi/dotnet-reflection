@@ -11,7 +11,6 @@
 
             if (!File.Exists(filePath))
             {
-                // TODO: check
                 throw new FileNotFoundException($"File '{filePath}' does not exist");
             }
 

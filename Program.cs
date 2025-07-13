@@ -5,36 +5,47 @@ namespace dotnet_reflection
 {
     internal class Program
     {
+        readonly static string ConfigurationFilePath = "C:\\Users\\Bohdan_Zhylavskyi\\Desktop\\config.txt";
+
         static void Main(string[] args)
         {
             ConfigureConfigurationProviders();
 
             var appSettings = new AppSettings();
 
-            Console.WriteLine(appSettings.Limit);
+            Console.WriteLine("Initial Settings:");
+            PrintAllProperties(appSettings);
 
-            appSettings.Limit = 120;
+            appSettings.MaxRequestPerSecond = 120;
+            appSettings.Locale = "uk";
+            appSettings.RetryTimeout = TimeSpan.Parse("00:05:00");
 
-            Console.WriteLine($"After change: {appSettings.Limit + 200}");
+            Console.WriteLine($"\nSettings After Update:");
+            PrintAllProperties(appSettings);
+        }
+
+        private static void PrintAllProperties(object obj)
+        {
+            var properties = obj.GetType().GetProperties();
+
+            foreach (var prop in properties)
+            {
+                Console.WriteLine(
+                    $"[Property Name]: {prop.Name}, " +
+                    $"[Property Value]: {prop.GetValue(obj) ?? "null"}, " +
+                    $"[Property Type]: {Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType}"
+                );
+            }
         }
 
         private static void ConfigureConfigurationProviders()
         {
-            var fp = ConfigureFileConfigurationProvider();
             var providers = new Dictionary<ProviderType, IConfigurationProvider>()
             {
-                { ProviderType.File, fp},
+                { ProviderType.File, new FileConfigurationProvider(ConfigurationFilePath)},
             };
 
             ConfigurationComponentBase.ConfigureProviders(providers);
-        }
-
-        private static IConfigurationProvider ConfigureFileConfigurationProvider()
-        {
-            var filePath = "C:\\Users\\Bohdan_Zhylavskyi\\Desktop\\config.txt";
-            var fp = new FileConfigurationProvider(filePath);
-
-            return fp;
         }
     }
 }

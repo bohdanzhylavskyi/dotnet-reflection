@@ -2,18 +2,32 @@
 {
     internal class AppSettings : ConfigurationComponentBase
     {
-        [ConfigurationItemAttribute("theme", ProviderType.File)]
-        public string Theme
+        [ConfigurationItemAttribute("locale", ProviderType.File)]
+        public string? Locale
         {
-            get => ReadSetting<string>(nameof(Theme));
-            set => WriteSetting(nameof(Theme), value);
+            get => ReadSetting(nameof(Locale));
+            set => WriteSetting(nameof(Locale), value);
         }
 
-        [ConfigurationItemAttribute("limit", ProviderType.File)]
-        public int Limit
+        [ConfigurationItemAttribute("maxRequestPerSecond", ProviderType.File)]
+        public int? MaxRequestPerSecond
         {
-            get => ReadSetting<int>(nameof(Limit));
-            set => WriteSetting(nameof(Limit), value);
+            get => ReadIntSetting(nameof(MaxRequestPerSecond));
+            set => WriteSetting(nameof(MaxRequestPerSecond), value);
+        }
+
+        [ConfigurationItemAttribute("memoryLimitInGb", ProviderType.File)]
+        public float? MemoryLimitInGb
+        {
+            get => ReadFloatSetting(nameof(MemoryLimitInGb));
+            set => WriteSetting(nameof(MemoryLimitInGb), value);
+        }
+
+        [ConfigurationItemAttribute("retryTimeout", ProviderType.File)]
+        public TimeSpan? RetryTimeout
+        {
+            get => ReadTimeSpanSetting(nameof(RetryTimeout));
+            set => WriteSetting(nameof(RetryTimeout), value);
         }
     }
 }
