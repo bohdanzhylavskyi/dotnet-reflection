@@ -21,7 +21,7 @@ namespace dotnet_reflection
                 return LoadFromAssemblyPath(assemblyPath);
             }
 
-            throw new FileNotFoundException($"Assembly '{assemblyName.FullName}' is not found");
+            return null;
         }
     }
 }
