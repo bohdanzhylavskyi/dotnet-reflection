@@ -1,1 +1,1 @@
-﻿maxRequestPerSecond=1114
+﻿maxRequestPerSecond=70

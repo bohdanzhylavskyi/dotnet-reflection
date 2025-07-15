@@ -2,17 +2,9 @@
 
 namespace FileConfigurationProvider
 {
-    public class FileConfigurationProviderBuilder : IConfigurationProviderBuilder
-    {
-        public IConfigurationProvider Build(IConfigurationProvidersOptions options)
-        {
-            return new FileConfigurationProvider(options.ForFileConfigurationProvider());
-        }
-    }
-
     public class FileConfigurationProvider : IConfigurationProvider
     {
-        private readonly string FilePath;
+        private readonly string filePath;
         private Dictionary<string, string> settings = new Dictionary<string, string>();
 
         public ProviderType GetProviderType()
@@ -37,7 +29,7 @@ namespace FileConfigurationProvider
                     settings[parts[0]] = parts[1];
             }
 
-            FilePath = options.FilePath;
+            this.filePath = options.FilePath;
         }
 
         public string? Get(string key)
@@ -47,12 +39,10 @@ namespace FileConfigurationProvider
 
         public void Save()
         {
-            IEnumerable<string> lines = settings.AsEnumerable().Select((pair) =>
-            {
-                return $"{pair.Key}={pair.Value}";
-            });
+            IEnumerable<string> lines = settings.AsEnumerable()
+                .Select((pair) => $"{pair.Key}={pair.Value}");
 
-            File.WriteAllLines(FilePath, lines);
+            File.WriteAllLines(filePath, lines);
         }
 
         public void Set(string key, string value)

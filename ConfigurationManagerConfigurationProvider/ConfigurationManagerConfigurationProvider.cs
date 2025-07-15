@@ -3,16 +3,6 @@ using System.Configuration;
 
 namespace ConfigurationManagerConfigurationProvider
 {
-    public class ConfigurationManagerConfigurationProviderBuilder : IConfigurationProviderBuilder
-    {
-        public IConfigurationProvider Build(IConfigurationProvidersOptions options)
-        {
-            return new ConfigurationManagerConfigurationProvider(
-                options.ForConfigurationManagerConfigurationProvider()
-            );
-        }
-    }
-
     public class ConfigurationManagerConfigurationProvider : IConfigurationProvider
     {
         private readonly Configuration configuration;
@@ -34,11 +24,12 @@ namespace ConfigurationManagerConfigurationProvider
 
         public void Save()
         {
+            configuration.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection(configuration.AppSettings.SectionInformation.Name);
         }
 
         public void Set(string key, string value)
         {
-            //var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             var settings = configuration.AppSettings.Settings;
 
             if (settings[key] == null)
@@ -49,10 +40,6 @@ namespace ConfigurationManagerConfigurationProvider
             {
                 settings[key].Value = value;
             }
-
-            configuration.Save(ConfigurationSaveMode.Modified);
-
-            ConfigurationManager.RefreshSection(configuration.AppSettings.SectionInformation.Name);
         }
     }
 }

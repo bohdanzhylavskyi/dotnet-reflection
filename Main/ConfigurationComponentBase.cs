@@ -1,4 +1,5 @@
-﻿using Shared;
+﻿using dotnet_reflection.Exceptions;
+using Shared;
 using System.Reflection;
 
 namespace dotnet_reflection
@@ -14,64 +15,54 @@ namespace dotnet_reflection
 
         public string? ReadSetting(string propertyName)
         {
-            PropertyInfo property = this.GetType().GetProperty(propertyName);
+            PropertyInfo property = this.GetType().GetProperty(propertyName)!;
 
-            var attribute = property.GetCustomAttribute<ConfigurationItemAttribute>();
+            var configItemAttr = property.GetCustomAttribute<ConfigurationItemAttribute>();
 
-            if (attribute == null)
+            if (configItemAttr == null)
             {
                 throw AttributeNotAppliedToPropertyException(propertyName);
             }
 
-            return ResolveProvider(attribute.Provider).Get(attribute.SettingName);
+            return ResolveConfigurationProvider(configItemAttr.Provider).Get(configItemAttr.SettingName);
         }
 
-        public int? ReadIntSetting(string propertyName)
-        {
-            var x = ReadSetting(propertyName);
+        public int? ReadIntSetting(string propertyName) => ReadSetting(propertyName) is string s ? int.Parse(s) : null;
 
-            return x == null ? null : int.Parse(x);
-        }
+        public float? ReadFloatSetting(string propertyName) => ReadSetting(propertyName) is string s ? float.Parse(s) : null;
 
-        public float? ReadFloatSetting(string propertyName)
-        {
-            var x = ReadSetting(propertyName);
-
-            return x == null ? null : float.Parse(x);
-        }
-
-        public TimeSpan? ReadTimeSpanSetting(string propertyName)
-        {
-            var x = ReadSetting(propertyName);
-
-            return x == null ? null : TimeSpan.Parse(x);
-        }
+        public TimeSpan? ReadTimeSpanSetting(string propertyName) => ReadSetting(propertyName) is string s ? TimeSpan.Parse(s) : null;
 
         public void WriteSetting<T>(string propertyName, T value)
         {
-            PropertyInfo property = this.GetType().GetProperty(propertyName);
+            PropertyInfo property = this.GetType().GetProperty(propertyName)!;
 
-            var attribute = property.GetCustomAttribute<ConfigurationItemAttribute>();
+            var configItemAttr = property.GetCustomAttribute<ConfigurationItemAttribute>();
 
-            if (attribute == null)
+            if (configItemAttr == null)
             {
                 throw AttributeNotAppliedToPropertyException(propertyName);
             }
 
-            var provider = ResolveProvider(attribute.Provider);
+            var provider = ResolveConfigurationProvider(configItemAttr.Provider);
 
-            provider.Set(attribute.SettingName, value.ToString());
+            provider.Set(configItemAttr.SettingName, value.ToString());
             provider.Save();
         }
 
         private Exception AttributeNotAppliedToPropertyException(string propertyName)
         {
-            return new InvalidOperationException($"The '{nameof(ConfigurationItemAttribute)}' attribute is not applied to property '{propertyName}'.");
+            return new ConfigurationItemAttrIsNotAppliedException(propertyName);
         }
 
-        private IConfigurationProvider ResolveProvider(ProviderType providerType)
+        private IConfigurationProvider ResolveConfigurationProvider(ProviderType providerType)
         {
-            return Providers[providerType];
+            if (Providers.TryGetValue(providerType, out IConfigurationProvider? provider))
+            {
+                return provider;
+            }
+
+            throw new MissingConfigurationProviderException(providerType);
         }
     }
 }
